@@ -6,12 +6,13 @@
 //
 
 import SwiftUI
+import PokemonAPI
 
 @main
 struct iDexApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            PokemonScreen()
         }
     }
 }

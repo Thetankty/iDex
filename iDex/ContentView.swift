@@ -7,18 +7,26 @@
 
 import SwiftUI
 
+
 struct ContentView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        NavigationView {
+            List {
+                NavigationLink("Completion Example", destination: CompletionExampleView())
+                NavigationLink("Combine Example", destination: CombineExampleView())
+                NavigationLink("Async/Await Example", destination: AsyncAwaitExampleView())
+                NavigationLink("Paginated Results Example", destination: ResultsView())
+            }
+            #if os(iOS) || os(macOS)
+            .listStyle(.sidebar)
+            #endif
         }
-        .padding()
     }
 }
 
-#Preview {
-    ContentView()
+
+struct ContentView_Previews: PreviewProvider {
+    static var previews: some View {
+        ContentView()
+    }
 }
