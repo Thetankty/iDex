@@ -25,6 +25,7 @@
 		2FD2DC5E2B8AD40F00980961 /* PokemonScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FD2DC5D2B8AD40F00980961 /* PokemonScreenView.swift */; };
 		2FF6D22C2B8BB37B0030E7A1 /* PokemonApi.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2FF6D22B2B8BB37B0030E7A1 /* PokemonApi.swift */; };
 		2FF6D22F2B8BD1B90030E7A1 /* FluidGradient in Frameworks */ = {isa = PBXBuildFile; productRef = 2FF6D22E2B8BD1B90030E7A1 /* FluidGradient */; };
+		2FF6D2322B8BD5E10030E7A1 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 2FF6D2312B8BD5E10030E7A1 /* SDWebImageSwiftUI */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -51,6 +52,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2FF6D2322B8BD5E10030E7A1 /* SDWebImageSwiftUI in Frameworks */,
 				2FD2DC492B8A5C6400980961 /* WhatsNewKit in Frameworks */,
 				2FF6D22F2B8BD1B90030E7A1 /* FluidGradient in Frameworks */,
 				2FD2DC462B8A5C1B00980961 /* PokemonAPI in Frameworks */,
@@ -134,6 +136,7 @@
 				2FD2DC452B8A5C1B00980961 /* PokemonAPI */,
 				2FD2DC482B8A5C6400980961 /* WhatsNewKit */,
 				2FF6D22E2B8BD1B90030E7A1 /* FluidGradient */,
+				2FF6D2312B8BD5E10030E7A1 /* SDWebImageSwiftUI */,
 			);
 			productName = iDex;
 			productReference = 2FD2DC332B8A5BE500980961 /* iDex.app */;
@@ -167,6 +170,7 @@
 				2FD2DC442B8A5C1B00980961 /* XCRemoteSwiftPackageReference "PokemonAPI" */,
 				2FD2DC472B8A5C6400980961 /* XCRemoteSwiftPackageReference "WhatsNewKit" */,
 				2FF6D22D2B8BD1B90030E7A1 /* XCRemoteSwiftPackageReference "FluidGradient" */,
+				2FF6D2302B8BD5E10030E7A1 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
 			);
 			productRefGroup = 2FD2DC342B8A5BE500980961 /* Products */;
 			projectDirPath = "";
@@ -438,6 +442,14 @@
 				minimumVersion = 1.0.0;
 			};
 		};
+		2FF6D2302B8BD5E10030E7A1 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.2.6;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -455,6 +467,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2FF6D22D2B8BD1B90030E7A1 /* XCRemoteSwiftPackageReference "FluidGradient" */;
 			productName = FluidGradient;
+		};
+		2FF6D2312B8BD5E10030E7A1 /* SDWebImageSwiftUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2FF6D2302B8BD5E10030E7A1 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
+			productName = SDWebImageSwiftUI;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
