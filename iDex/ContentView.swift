@@ -10,17 +10,7 @@ import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        NavigationView {
-            List {
-                NavigationLink("Completion Example", destination: CompletionExampleView())
-                NavigationLink("Combine Example", destination: CombineExampleView())
-                NavigationLink("Async/Await Example", destination: AsyncAwaitExampleView())
-                NavigationLink("Paginated Results Example", destination: ResultsView())
-            }
-            #if os(iOS) || os(macOS)
-            .listStyle(.sidebar)
-            #endif
-        }
+        Text("Hello")
     }
 }
 

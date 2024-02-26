@@ -12,7 +12,7 @@ import PokemonAPI
 struct iDexApp: App {
     var body: some Scene {
         WindowGroup {
-            PokemonScreen()
+            StartupScreen()
         }
     }
 }

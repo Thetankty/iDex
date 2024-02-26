@@ -16,7 +16,7 @@ struct PokemonScreen: View {
     @State private var pokemonList: [Pokemon] = []
     @State private var isSearchBarVisible = false
     @State private var searchText = ""
-    private let batchSize = 50 // Adjust batch size as needed
+    private let batchSize = 50
     
     var body: some View {
         NavigationView {
@@ -38,40 +38,40 @@ struct PokemonScreen: View {
                                     }
                                 }
                             }
-                            .padding(.bottom, 20) // Add padding to move the grid items down 20px
+                            .padding(.bottom, 20)
                         }
                     }
                 }
-                .padding(.top, 20) // Add padding to move the title and search bar down 20px
+                .padding(.top, 20)
             }
-            .navigationBarItems(
-                leading:
-                    Text("Pokémon")
-                        .font(.largeTitle)
-                        .padding(.top, 20), // Add padding to move the title down 20px
+            .navigationBarItems(leading:
+                Text("Pokémon")
+                    .font(.largeTitle)
+                    .padding(.top, 20),
                 trailing:
-                    HStack {
-                        if isSearchBarVisible {
-                            SearchBar(text: $searchText, placeholder: "Search Pokémon")
+                HStack {
+                    if isSearchBarVisible {
+                        SearchBar(text: $searchText, placeholder: "Search Pokémon")
+                            .padding(.top, 30)
+                    } else {
+                        Button(action: {
+                            isSearchBarVisible.toggle()
+                        }) {
+                            Image(systemName: "magnifyingglass")
+                                .foregroundColor(.primary)
+                                .font(.title)
+                                .padding(.trailing, 8)
                                 .padding(.top, 30)
-                        } else {
-                            Button(action: {
-                                isSearchBarVisible.toggle()
-                            }) {
-                                Image(systemName: "magnifyingglass")
-                                    .foregroundColor(.primary)
-                                    .font(.title)
-                                    .padding(.trailing, 8)
-                                    .padding(.top, 30)
-                            }
                         }
                     }
-                    .padding(.bottom) // Add more margin under the navigation bar items
+                }
+                .padding(.bottom)
             )
             .onAppear {
                 fetchPokemonList()
             }
         }
+        .navigationBarBackButtonHidden(true)
     }
 
     var filteredPokemonList: [Pokemon] {
