@@ -61,95 +61,50 @@ struct SearchBar: View {
     }
 }
 
+func capitalizeFirstLetter(_ text: String) -> String {
+    guard let firstLetter = text.first else { return "" }
+    return String(firstLetter).uppercased() + text.dropFirst()
+}
 
-
-
-struct PokemonMainScreen: View {
-    let pokemon: Pokemon
-    @State private var selectedTab = 0
+struct PokemonTypeImageView: View {
+    let type: String // Assuming type is a string representing the Pokémon type
 
     var body: some View {
-        VStack {
-            if let spriteURL = pokemon.spriteURL {
-                WebImage(url: spriteURL)
-                    .resizable()
-                    .frame(width: 100, height: 100)
-            } else {
-                Text("Sprite not available")
-            }
-            Text("Name: \(capitalizeFirstLetter(pokemon.name))")
-            Text("Pokedex Number: \(pokemon.id)")
-            Text("Height: \(pokemon.height)")
-            Text("Weight: \(pokemon.weight)")
-
-            HStack {
-                Spacer()
-                Button(action: {
-                    selectedTab = 0
-                }) {
-                    Text("Abilities")
-                        .padding()
-                        .background(selectedTab == 0 ? Color.blue : Color.clear)
-                        .foregroundColor(selectedTab == 0 ? .white : .blue)
-                        .cornerRadius(10)
-                }
-                Spacer()
-                Button(action: {
-                    selectedTab = 1
-                }) {
-                    Text("Moves")
-                        .padding()
-                        .background(selectedTab == 1 ? Color.blue : Color.clear)
-                        .foregroundColor(selectedTab == 1 ? .white : .blue)
-                        .cornerRadius(10)
-                }
-                Spacer()
-            }
-            .padding()
-
-            if selectedTab == 0 {
-                VStack {
-                    Text("Abilities:")
-                    ForEach(pokemon.abilities, id: \.self) { ability in
-                        Text(capitalizeFirstLetter(ability))
-                    }
-                }
-            } else {
-                ScrollView{
-                    VStack {
-                        Text("Moves:")
-                        ForEach(pokemon.moves, id: \.self) { move in
-                            Text(capitalizeFirstLetter(move))
-                        }
-                    }
-                }
-            }
-            Spacer()
-        }
+        Image(type.lowercased()) // Assuming image names match type names
+            .resizable()
+            .aspectRatio(contentMode: .fit)
+            .frame(width: 30, height: 30) // Adjust size as needed
+            .padding(5)
+            .background(Color.white)
+            .cornerRadius(5)
     }
 }
 
-struct PokemonItemView: View {
-    let pokemon: Pokemon
-    
-    var body: some View {
-        VStack {
-            if let spriteURL = pokemon.spriteURL {
-                WebImage(url: spriteURL)
-                    .resizable()
-                    .frame(width: 100, height: 100)
-                    .clipShape(Circle())
-                    .padding(.bottom, 5)
-            } else {
-                Text("Sprite not available")
-            }
-            Text(pokemon.name.capitalized) // Display Pokémon's name
-                .foregroundColor(.white)
-                .padding(.top, 5)
-        }
-        .padding(10) // Add padding around the whole VStack
-        .foregroundColor(Color(.white))
-        .background(Color(hue: 1.0, saturation: 0.0, brightness: 0.971, opacity: 0.25).blur(radius: 10))
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+extension String {
+    func capitalizedFirstLetter() -> String {
+        guard let first = self.first else { return self }
+        return String(first).uppercased() + self.dropFirst()
     }
 }
+
+struct PokemonMove: Codable {
+    let name: String
+    let power: Int
+    let accuracy: Int
+    let pp: Int
+}
+
+struct MoveCategory: Codable {
+    let id: Int
+    let name: String
+    let moves: [NamedAPIResource]
+}
+
+struct NamedAPIResource: Codable {
+    let name: String
+    let url: String
+}
+
+
+
+
