@@ -12,18 +12,29 @@ import SDWebImageSwiftUI
 struct PokemonMainScreen: View {
     let pokemon: Pokemon
     @State private var selectedTab = 0
-    @State private var move: PokemonMove?
-    @State private var moveDetails: [String: PokemonMove] = [:]
-    
+    @State private var moveDetails: [String: PokemonMove?] = [:]
+    @State private var isShinySpriteOn = false
+    @State private var pokemonStats: [PokemonStat] = []
+
     var body: some View {
         VStack {
             // Sprite
-            if let spriteURL = pokemon.spriteURL {
-                WebImage(url: spriteURL)
-                    .resizable()
-                    .frame(width: 100, height: 100)
+            if isShinySpriteOn {
+                if let shinySpriteURL = pokemon.frontShinySpriteURL {
+                    WebImage(url: shinySpriteURL)
+                        .resizable()
+                        .frame(width: 100, height: 100)
+                } else {
+                    Text("Shiny sprite not available")
+                }
             } else {
-                Text("Sprite not available")
+                if let spriteURL = pokemon.spriteURL {
+                    WebImage(url: spriteURL)
+                        .resizable()
+                        .frame(width: 100, height: 100)
+                } else {
+                    Text("Sprite not available")
+                }
             }
             
             // Pokedex number and Pokemon name
@@ -35,128 +46,103 @@ struct PokemonMainScreen: View {
             
             // Tabs
             HStack {
-                Spacer()
-                Button(action: {
-                    selectedTab = 0
-                }) {
-                    Text("About")
-                        .padding()
-                        .background(selectedTab == 0 ? Color.blue : Color.clear)
-                        .foregroundColor(selectedTab == 0 ? .white : .blue)
-                        .cornerRadius(10)
+                ForEach(0..<4) { index in
+                    Button(action: {
+                        selectedTab = index
+                    }) {
+                        Text(tabTitles[index])
+                            .padding()
+                            .background(selectedTab == index ? Color.blue : Color.clear)
+                            .foregroundColor(selectedTab == index ? .white : .blue)
+                            .cornerRadius(10)
+                    }
+                    Spacer()
                 }
-                Spacer()
-                Button(action: {
-                    selectedTab = 1
-                }) {
-                    Text("Stats")
-                        .padding()
-                        .background(selectedTab == 1 ? Color.blue : Color.clear)
-                        .foregroundColor(selectedTab == 1 ? .white : .blue)
-                        .cornerRadius(10)
-                }
-                Spacer()
-                Button(action: {
-                    selectedTab = 2
-                }) {
-                    Text("Moves")
-                        .padding()
-                        .background(selectedTab == 2 ? Color.blue : Color.clear)
-                        .foregroundColor(selectedTab == 2 ? .white : .blue)
-                        .cornerRadius(10)
-                }
-                Spacer()
-                Button(action: {
-                    selectedTab = 3
-                }) {
-                    Text("Other")
-                        .padding()
-                        .background(selectedTab == 3 ? Color.blue : Color.clear)
-                        .foregroundColor(selectedTab == 3 ? .white : .blue)
-                        .cornerRadius(10)
-                }
-                Spacer()
             }
             .padding(.top, 20)
             
             // Content based on selected tab
-            if selectedTab == 0 {
+            TabView(selection: $selectedTab) {
                 AboutTabView(pokemon: pokemon)
-            } else if selectedTab == 1 {
-                Text("Stats tab content goes here")
-            }  else if selectedTab == 2 {
-                    MovesTabView(pokemon: pokemon, moveDetails: moveDetails)
-            }else {
-                Text("Other tab content goes here")
+                    .tag(0)
+                StatsTabView(stats: pokemonStats)
+                    .tag(1)
+                MovesTabView(pokemon: pokemon, moveDetails: $moveDetails)
+                    .tag(2)
+                Toggle("Shiny Sprite", isOn: $isShinySpriteOn)
+                    .padding(.top, 10)
+                    .tag(3)
             }
+            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+            .padding(.top, 20)
             
             Spacer()
         }
         .padding()
-        .onAppear{
-            preloadMoveDetails()
+        .onAppear {
+            if pokemonStats.isEmpty {
+                fetchPokemonStats()
             }
+        }
     }
     
-    private func preloadMoveDetails() {
-            for moveName in pokemon.moves {
-                fetchMoveDetails(moveName: moveName) { result in
+    private func fetchPokemonStats() {
+        let statNames = ["hp", "attack", "defense", "special-attack", "special-defense", "speed"]
+        
+        DispatchQueue.global().async {
+            let group = DispatchGroup()
+            
+            for statName in statNames {
+                group.enter()
+                fetchStatDetails(statName: statName) { result in
+                    defer { group.leave() }
+                    
                     switch result {
-                    case .success(let move):
-                        moveDetails[moveName] = move
+                    case .success(let stat):
+                        DispatchQueue.main.async {
+                            pokemonStats.append(stat)
+                        }
                     case .failure(let error):
-                        print("Error fetching move data for \(moveName): \(error)")
+                        print("Error fetching stat \(statName): \(error)")
                     }
                 }
             }
-        }
-        
-        private func tabTitle(for index: Int) -> String {
-            switch index {
-            case 0: return "About"
-            case 1: return "Stats"
-            case 2: return "Moves"
-            default: return "Other"
-            }
+            
+            group.wait()
         }
     }
+}
 
-    struct AboutTabView: View {
-        let pokemon: Pokemon
-        
-        var body: some View {
-            VStack(alignment: .leading) {
-                // Types
-                HStack {
-                    Text("Types:")
-                        .fontWeight(.bold)
-                    ForEach(pokemon.types, id: \.self) { type in
-                        Text(type.capitalizedFirstLetter())
-                    }
-                }
+struct AboutTabView: View {
+    let pokemon: Pokemon
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text("Types:")
+                .fontWeight(.bold)
+            ForEach(pokemon.types, id: \.self) { type in
+                Text(type.capitalizedFirstLetter())
+            }
+            .padding(.bottom, 5)
+            
+            Text("Height: \(String(format: "%.2f", Double(pokemon.height) / 10)) meters")
                 .padding(.bottom, 5)
-                
-                // Height
-                Text("Height: \(String(format: "%.2f", Double(pokemon.height) / 10)) meters")
-                    .padding(.bottom, 5)
-                
-                // Weight
-                Text("Weight: \(String(format: "%.1f", Double(pokemon.weight) / 10)) kg")
-                    .padding(.bottom, 5)
-                
-                // Abilities
-                Text("Abilities:")
-                    .fontWeight(.bold)
-                ForEach(pokemon.abilities, id: \.self) { ability in
-                    Text(ability.capitalizedFirstLetter())
-                }
+            
+            Text("Weight: \(String(format: "%.1f", Double(pokemon.weight) / 10)) kg")
+                .padding(.bottom, 5)
+            
+            Text("Abilities:")
+                .fontWeight(.bold)
+            ForEach(pokemon.abilities, id: \.self) { ability in
+                Text(ability.capitalizedFirstLetter())
             }
         }
     }
+}
 
 struct MovesTabView: View {
     let pokemon: Pokemon
-    let moveDetails: [String: PokemonMove]
+    @Binding var moveDetails: [String: PokemonMove?]
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -182,6 +168,11 @@ struct MovesTabView: View {
                     ForEach(pokemon.moves, id: \.self) { moveName in
                         if let move = moveDetails[moveName] {
                             MoveRow(move: move)
+                        } else {
+                            Text("Loading move...")
+                                .onAppear {
+                                    preloadMoveDetails(moveName: moveName)
+                                }
                         }
                     }
                 }
@@ -191,28 +182,48 @@ struct MovesTabView: View {
             .cornerRadius(10)
         }
     }
-}
-
-
-struct MoveRow: View {
-    let move: PokemonMove
     
-    var body: some View {
-        VStack(spacing: 8) {
-            HStack {
-                Text(move.name.capitalized)
-                Spacer()
-                Text("\(move.power)")
-                Text("\(move.accuracy)")
-                Text("\(move.pp)")
+    private func preloadMoveDetails(moveName: String) {
+        fetchMoveDetails(moveName: moveName) { result in
+            switch result {
+            case .success(let move):
+                DispatchQueue.main.async {
+                    moveDetails[moveName] = move
+                }
+            case .failure(let error):
+                print("Error fetching move data for \(moveName): \(error)")
             }
-            .padding(.vertical, 8) // Add vertical padding
-            
-            Divider() // Add a divider between move rows
         }
     }
 }
 
+struct MoveRow: View {
+    let move: PokemonMove?
+    
+    var body: some View {
+        if let move = move {
+            VStack(spacing: 8) {
+                HStack {
+                    Text(move.name.capitalized)
+                    Spacer()
+                    Text("\(move.power.map { "\($0)" } ?? "N/A")")
+                    Text("\(move.accuracy.map { "\($0)" } ?? "N/A")")
+                    Text("\(move.pp)")
+                }
+                .padding(.vertical, 8)
+                
+                Divider()
+            }
+        } else {
+            Text("Move details not available")
+                .foregroundColor(.red)
+                .padding(.vertical, 8)
+        }
+    }
+}
+
+
+private let tabTitles = ["About", "Stats", "Moves", "Other"]
 
 func fetchMoveDetails(moveName: String, completion: @escaping (Result<PokemonMove, Error>) -> Void) {
     let urlString = "https://pokeapi.co/api/v2/move/\(moveName.lowercased())/"
@@ -225,15 +236,76 @@ func fetchMoveDetails(moveName: String, completion: @escaping (Result<PokemonMov
         guard let data = data, error == nil else {
             if let error = error {
                 completion(.failure(error))
+            } else {
+                completion(.failure(NSError(domain: "Data is nil", code: 0, userInfo: nil)))
             }
             return
         }
         
         do {
-            let move = try JSONDecoder().decode(PokemonMove.self, from: data)
+            let decoder = JSONDecoder()
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            let move = try decoder.decode(PokemonMove.self, from: data)
             completion(.success(move))
         } catch {
             completion(.failure(error))
         }
     }.resume()
+}
+
+func fetchStatDetails(statName: String, completion: @escaping (Result<PokemonStat, Error>) -> Void) {
+    let urlString = "https://pokeapi.co/api/v2/stat/\(statName.lowercased())/"
+    guard let url = URL(string: urlString) else {
+        completion(.failure(NSError(domain: "Invalid URL", code: 0, userInfo: nil)))
+        return
+    }
+
+    URLSession.shared.dataTask(with: url) { data, response, error in
+        guard let data = data, error == nil else {
+            if let error = error {
+                completion(.failure(error))
+            } else {
+                completion(.failure(NSError(domain: "Data is nil", code: 0, userInfo: nil)))
+            }
+            return
+        }
+
+        do {
+            let decoder = JSONDecoder()
+            decoder.keyDecodingStrategy = .convertFromSnakeCase
+            let stat = try decoder.decode(PokemonStat.self, from: data)
+            completion(.success(stat))
+        } catch {
+            completion(.failure(error))
+        }
+    }.resume()
+}
+
+struct StatsTabView: View {
+    let stats: [PokemonStat]
+
+    var body: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 10) {
+                ForEach(stats, id: \.id) { stat in
+                    StatRow(stat: stat)
+                }
+            }
+            .padding()
+        }
+    }
+}
+
+struct StatRow: View {
+    let stat: PokemonStat
+
+    var body: some View {
+        HStack {
+            Text(stat.name)
+                .fontWeight(.bold)
+            Spacer()
+            Text("\(stat.gameIndex)")
+        }
+        .padding(.vertical, 8)
+    }
 }

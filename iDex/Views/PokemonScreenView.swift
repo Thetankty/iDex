@@ -14,7 +14,7 @@ struct PokemonScreen: View {
     @State private var isSearchBarVisible = false
     @State private var searchText = ""
     @State private var pokemonList: [Pokemon] = []
-
+    
     var body: some View {
         NavigationView {
             ZStack {
@@ -22,18 +22,18 @@ struct PokemonScreen: View {
                               highlights: [.yellow, .orange, .purple],
                               speed: 0.4,
                               blur: 0.75)
-                    .edgesIgnoringSafeArea(.all)
-                    .preferredColorScheme(.dark)
-
+                .edgesIgnoringSafeArea(.all)
+                .preferredColorScheme(.dark)
+                
                 VStack(spacing: 20) {
                     if isSearchBarVisible || searchText.isEmpty {
                         ScrollView {
                             LazyVGrid(columns: [
                                 GridItem(.flexible()),
                                 GridItem(.flexible()),
-                                GridItem(.flexible()),
-                            ]) {
-                                ForEach(filteredPokemonList) { pokemon in
+                                GridItem(.flexible())
+                            ], spacing: 20) {
+                                ForEach(filteredPokemonList, id: \.id) { pokemon in
                                     NavigationLink(destination: PokemonMainScreen(pokemon: pokemon)) {
                                         PokemonItemView(pokemon: pokemon)
                                     }
@@ -48,8 +48,8 @@ struct PokemonScreen: View {
             .navigationBarItems(
                 leading:
                     Text("Pokémon")
-                        .font(.largeTitle)
-                        .padding(.top, 20),
+                    .font(.largeTitle)
+                    .padding(.top, 20),
                 trailing:
                     HStack {
                         if isSearchBarVisible {
@@ -72,10 +72,14 @@ struct PokemonScreen: View {
             .onAppear {
                 fetchPokemonList()
             }
+            .onDisappear {
+                // Reset or update state variables if needed when navigating away
+                searchText = ""
+            }
         }
         .navigationBarBackButtonHidden(true)
     }
-
+    
     var filteredPokemonList: [Pokemon] {
         if searchText.isEmpty {
             return pokemonList
@@ -83,7 +87,7 @@ struct PokemonScreen: View {
             return pokemonList.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
         }
     }
-
+    
     func fetchPokemonList() {
         DispatchQueue.global().async {
             for id in 1...898 {
@@ -94,13 +98,15 @@ struct PokemonScreen: View {
                            let sprites = pkmpokemon.sprites,
                            let frontDefault = sprites.frontDefault,
                            let spriteURL = URL(string: frontDefault),
+                           let frontShinyDefault = sprites.frontShiny,
+                           let shinySpriteURL = URL(string: frontShinyDefault),
                            let height = pkmpokemon.height,
                            let weight = pkmpokemon.weight,
                            let abilities = pkmpokemon.abilities?.compactMap({ $0.ability?.name }),
                            let types = pkmpokemon.types?.compactMap({ $0.type?.name }),
                            let moves = pkmpokemon.moves?.compactMap({ $0.move?.name }) {
 
-                            let pokemon = Pokemon(id: id, name: name, height: height, weight: weight, abilities: abilities, spriteURL: spriteURL, types: types, moves: moves)
+                            let pokemon = Pokemon(id: id, name: name, frontShinySpriteURL: shinySpriteURL, spriteURL: spriteURL, height: height, weight: weight, types: types, abilities: abilities, moves: moves, stats: [])
 
                             DispatchQueue.main.async {
                                 pokemonList.append(pokemon)
@@ -121,5 +127,4 @@ struct PokemonScreen_Previews: PreviewProvider {
         PokemonScreen()
     }
 }
-
 

@@ -13,12 +13,14 @@ import SDWebImageSwiftUI
 struct Pokemon: Identifiable {
     let id: Int
     let name: String
+    let frontShinySpriteURL: URL?
+    let spriteURL: URL?
     let height: Int
     let weight: Int
-    let abilities: [String]
-    let spriteURL: URL?
     let types: [String]
+    let abilities: [String]
     let moves: [String]
+    let stats: [PokemonStat]
 }
 
 struct SearchBar: View {
@@ -89,22 +91,14 @@ extension String {
 
 struct PokemonMove: Codable {
     let name: String
-    let power: Int
-    let accuracy: Int
+    let power: Int?
+    let accuracy: Int?
     let pp: Int
 }
 
-struct MoveCategory: Codable {
+struct PokemonStat: Codable {
     let id: Int
     let name: String
-    let moves: [NamedAPIResource]
+    let gameIndex: Int
+    let isBattleOnly: Bool
 }
-
-struct NamedAPIResource: Codable {
-    let name: String
-    let url: String
-}
-
-
-
-
