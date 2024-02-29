@@ -10,7 +10,7 @@ import PokemonAPI
 import SwiftUI
 import SDWebImageSwiftUI
 
-struct Pokemon: Identifiable {
+struct Pokemon: Identifiable, Decodable, Equatable, Hashable {
     let id: Int
     let name: String
     let frontShinySpriteURL: URL?
@@ -21,7 +21,18 @@ struct Pokemon: Identifiable {
     let abilities: [String]
     let moves: [String]
     let stats: [PokemonStat]
+    
+    // Implementing Equatable protocol
+    static func == (lhs: Pokemon, rhs: Pokemon) -> Bool {
+        return lhs.id == rhs.id
+    }
+    
+    // Implementing Hashable protocol
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
 }
+
 
 struct SearchBar: View {
     @Binding var text: String
@@ -101,4 +112,12 @@ struct PokemonStat: Codable {
     let name: String
     let gameIndex: Int
     let isBattleOnly: Bool
+}
+
+extension Array {
+    func chunked(into size: Int) -> [[Element]] {
+        return stride(from: 0, to: count, by: size).map {
+            Array(self[$0..<Swift.min($0 + size, count)])
+        }
+    }
 }

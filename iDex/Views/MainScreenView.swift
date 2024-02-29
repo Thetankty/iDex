@@ -17,73 +17,78 @@ struct PokemonMainScreen: View {
     @State private var pokemonStats: [PokemonStat] = []
 
     var body: some View {
-        VStack {
-            // Sprite
-            if isShinySpriteOn {
-                if let shinySpriteURL = pokemon.frontShinySpriteURL {
-                    WebImage(url: shinySpriteURL)
-                        .resizable()
-                        .frame(width: 100, height: 100)
-                } else {
-                    Text("Shiny sprite not available")
-                }
-            } else {
-                if let spriteURL = pokemon.spriteURL {
-                    WebImage(url: spriteURL)
-                        .resizable()
-                        .frame(width: 100, height: 100)
-                } else {
-                    Text("Sprite not available")
-                }
-            }
+        NavigationView() {
             
-            // Pokedex number and Pokemon name
-            HStack {
-                Text("Pokedex number: #\(String(format: "%03d", pokemon.id))")
-                Text(pokemon.name.capitalizedFirstLetter())
-            }
-            .padding(.top, 10)
-            
-            // Tabs
-            HStack {
-                ForEach(0..<4) { index in
-                    Button(action: {
-                        selectedTab = index
-                    }) {
-                        Text(tabTitles[index])
-                            .padding()
-                            .background(selectedTab == index ? Color.blue : Color.clear)
-                            .foregroundColor(selectedTab == index ? .white : .blue)
-                            .cornerRadius(10)
+            VStack {
+                // Sprite
+                if isShinySpriteOn {
+                    if let shinySpriteURL = pokemon.frontShinySpriteURL {
+                        WebImage(url: shinySpriteURL)
+                            .resizable()
+                            .frame(width: 100, height: 100)
+                    } else {
+                        Text("Shiny sprite not available")
                     }
-                    Spacer()
+                } else {
+                    if let spriteURL = pokemon.spriteURL {
+                        WebImage(url: spriteURL)
+                            .resizable()
+                            .frame(width: 100, height: 100)
+                    } else {
+                        Text("Sprite not available")
+                    }
+                }
+                
+                // Pokedex number and Pokemon name
+                HStack {
+                    Text("Pokedex number: #\(String(format: "%03d", pokemon.id))")
+                    Text(pokemon.name.capitalizedFirstLetter())
+                }
+                .padding(.top, 10)
+                
+                // Tabs
+                HStack {
+                    ForEach(0..<4) { index in
+                        Button(action: {
+                            selectedTab = index
+                        }) {
+                            Text(tabTitles[index])
+                                .padding()
+                                .background(selectedTab == index ? Color.blue : Color.clear)
+                                .foregroundColor(selectedTab == index ? .white : .blue)
+                                .cornerRadius(10)
+                        }
+                        Spacer()
+                    }
+                }
+                .padding(.top, 20)
+                
+                // Content based on selected tab
+                TabView(selection: $selectedTab) {
+                    AboutTabView(pokemon: pokemon)
+                        .tag(0)
+                    StatsTabView(stats: pokemonStats)
+                        .tag(1)
+                    MovesTabView(pokemon: pokemon, moveDetails: $moveDetails)
+                        .tag(2)
+                    Toggle("Shiny Sprite", isOn: $isShinySpriteOn)
+                        .padding(.top, 10)
+                        .tag(3)
+                }
+                .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                .padding(.top, 20)
+                
+                Spacer()
+            }
+            .padding()
+            .onAppear {
+                if pokemonStats.isEmpty {
+                    fetchPokemonStats()
                 }
             }
-            .padding(.top, 20)
             
-            // Content based on selected tab
-            TabView(selection: $selectedTab) {
-                AboutTabView(pokemon: pokemon)
-                    .tag(0)
-                StatsTabView(stats: pokemonStats)
-                    .tag(1)
-                MovesTabView(pokemon: pokemon, moveDetails: $moveDetails)
-                    .tag(2)
-                Toggle("Shiny Sprite", isOn: $isShinySpriteOn)
-                    .padding(.top, 10)
-                    .tag(3)
-            }
-            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-            .padding(.top, 20)
-            
-            Spacer()
         }
-        .padding()
-        .onAppear {
-            if pokemonStats.isEmpty {
-                fetchPokemonStats()
-            }
-        }
+        
     }
     
     private func fetchPokemonStats() {

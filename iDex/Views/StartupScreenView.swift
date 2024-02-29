@@ -7,9 +7,43 @@
 
 import SwiftUI
 import FluidGradient
+import WhatsNewKit
 
 struct StartupScreen: View {
     @State private var isNavigationActive = false
+    @State
+    var whatsNew: WhatsNew? = WhatsNew(
+        title: "iDex",
+        features: [
+            .init(
+                image: .init(
+                    systemName: "star.fill",
+                    foregroundColor: .orange
+                ),
+                title: "Added Stats to Pokemon Page",
+                subtitle: "Hp, Special-Defense, Attack, Defense, Speed and Special-Attack"
+            ),
+            
+            .init(
+                image: .init(
+                    systemName: "paintbrush.fill",
+                    foregroundColor: .purple
+                ),
+                title: "Updated Gradient",
+                subtitle: "Improving the asthetics for the app"
+            ),
+            
+            .init(
+                image: .init(
+                    systemName: "ladybug.fill",
+                    foregroundColor: .red
+                ),
+                title: "Performance Upgrades",
+                subtitle: "Utilising caching to speed up the loading of the app"
+            ),
+            
+        ]
+    )
     
     var body: some View {
         NavigationView {
@@ -52,7 +86,9 @@ struct StartupScreen: View {
                 }
             }
             .navigationBarHidden(true)
-        }
+        }.sheet(
+            whatsNew: self.$whatsNew
+            )
     }
 }
 

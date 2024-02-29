@@ -22,25 +22,34 @@ struct PokemonScreen: View {
                               highlights: [.yellow, .orange, .purple],
                               speed: 0.4,
                               blur: 0.75)
-                .edgesIgnoringSafeArea(.all)
-                .preferredColorScheme(.dark)
+                    .edgesIgnoringSafeArea(.all)
+                    .preferredColorScheme(.dark)
                 
                 VStack(spacing: 20) {
                     if isSearchBarVisible || searchText.isEmpty {
-                        ScrollView {
-                            LazyVGrid(columns: [
-                                GridItem(.flexible()),
-                                GridItem(.flexible()),
-                                GridItem(.flexible())
-                            ], spacing: 20) {
-                                ForEach(filteredPokemonList, id: \.id) { pokemon in
-                                    NavigationLink(destination: PokemonMainScreen(pokemon: pokemon)) {
-                                        PokemonItemView(pokemon: pokemon)
+                        VStack {
+                            Spacer()
+                            ScrollView {
+                                LazyVStack(alignment: .leading, spacing: 20) {
+                                    ForEach(filteredPokemonList.chunked(into: 3), id: \.self) { rowPokemon in
+                                        HStack(spacing: 20) {
+                                            ForEach(rowPokemon, id: \.id) { pokemon in
+                                                NavigationLink(destination: PokemonMainScreen(pokemon: pokemon)) {
+                                                    PokemonItemView(pokemon: pokemon)
+                                                        .frame(maxWidth: .infinity)
+                                                }
+                                            }
+                                        }
                                     }
                                 }
+                                .ignoresSafeArea()
+                                
                             }
-                            .padding(.bottom, 20)
+                            Spacer()
                         }
+                    } else {
+                        Text("No Pokémon found")
+                            .foregroundColor(.white)
                     }
                 }
                 .padding(.top, 20)
@@ -69,13 +78,15 @@ struct PokemonScreen: View {
                     }
                     .padding(.bottom)
             )
-            .onAppear {
-                fetchPokemonList()
-            }
             .onDisappear {
                 // Reset or update state variables if needed when navigating away
                 searchText = ""
             }
+        }
+        .onAppear() {
+            
+            fetchPokemonList()
+            
         }
         .navigationBarBackButtonHidden(true)
     }
@@ -127,4 +138,3 @@ struct PokemonScreen_Previews: PreviewProvider {
         PokemonScreen()
     }
 }
-
