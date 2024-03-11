@@ -20,14 +20,10 @@ struct Pokemon: Identifiable, Decodable, Equatable, Hashable {
     let types: [String]
     let abilities: [String]
     let moves: [String]
-    let stats: [PokemonStat]
     
-    // Implementing Equatable protocol
     static func == (lhs: Pokemon, rhs: Pokemon) -> Bool {
         return lhs.id == rhs.id
     }
-    
-    // Implementing Hashable protocol
     func hash(into hasher: inout Hasher) {
         hasher.combine(id)
     }
@@ -52,8 +48,8 @@ struct SearchBar: View {
                     HStack {
                         Image(systemName: "magnifyingglass")
                             .foregroundColor(.gray)
-                            .padding(.leading, 15) // Add padding to the leading edge of the magnifying glass icon
-                            .padding(.trailing, 4) // Add padding to the trailing edge of the magnifying glass icon
+                            .padding(.leading, 15) 
+                            .padding(.trailing, 4)
 
                         Spacer()
                         
@@ -80,13 +76,13 @@ func capitalizeFirstLetter(_ text: String) -> String {
 }
 
 struct PokemonTypeImageView: View {
-    let type: String // Assuming type is a string representing the Pokémon type
+    let type: String
 
     var body: some View {
-        Image(type.lowercased()) // Assuming image names match type names
+        Image(type.lowercased())
             .resizable()
             .aspectRatio(contentMode: .fit)
-            .frame(width: 30, height: 30) // Adjust size as needed
+            .frame(width: 30, height: 30)
             .padding(5)
             .background(Color.white)
             .cornerRadius(5)
@@ -107,13 +103,6 @@ struct PokemonMove: Codable {
     let pp: Int
 }
 
-struct PokemonStat: Codable {
-    let id: Int
-    let name: String
-    let gameIndex: Int
-    let isBattleOnly: Bool
-}
-
 extension Array {
     func chunked(into size: Int) -> [[Element]] {
         return stride(from: 0, to: count, by: size).map {
@@ -121,3 +110,28 @@ extension Array {
         }
     }
 }
+
+extension Color {
+    init(hex: String) {
+        let scanner = Scanner(string: hex)
+        var rgbValue: UInt64 = 0
+        
+        scanner.scanHexInt64(&rgbValue)
+        
+        let red = Double((rgbValue & 0xFF0000) >> 16) / 255.0
+        let green = Double((rgbValue & 0x00FF00) >> 8) / 255.0
+        let blue = Double(rgbValue & 0x0000FF) / 255.0
+        
+        self.init(red: red, green: green, blue: blue)
+    }
+}
+
+extension PokemonAPI: ObservableObject { }
+
+extension Image {
+    static let left = Image(systemName: "chevron.left")
+    static let right = Image(systemName: "chevron.right")
+    static let first = Image(systemName: "chevron.left.2")
+    static let last = Image(systemName: "chevron.right.2")
+}
+

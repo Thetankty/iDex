@@ -42,6 +42,7 @@ struct PokemonScreen: View {
                                         }
                                     }
                                 }
+
                                 .ignoresSafeArea()
                                 
                             }
@@ -79,7 +80,6 @@ struct PokemonScreen: View {
                     .padding(.bottom)
             )
             .onDisappear {
-                // Reset or update state variables if needed when navigating away
                 searchText = ""
             }
         }
@@ -117,11 +117,11 @@ struct PokemonScreen: View {
                            let types = pkmpokemon.types?.compactMap({ $0.type?.name }),
                            let moves = pkmpokemon.moves?.compactMap({ $0.move?.name }) {
 
-                            let pokemon = Pokemon(id: id, name: name, frontShinySpriteURL: shinySpriteURL, spriteURL: spriteURL, height: height, weight: weight, types: types, abilities: abilities, moves: moves, stats: [])
+                            let pokemon = Pokemon(id: id, name: name, frontShinySpriteURL: shinySpriteURL, spriteURL: spriteURL, height: height, weight: weight, types: types, abilities: abilities, moves: moves)
 
                             DispatchQueue.main.async {
                                 pokemonList.append(pokemon)
-                                pokemonList.sort { $0.id < $1.id } // Sort the list
+                                pokemonList.sort { $0.id < $1.id }
                             }
                         }
                     case .failure(let error):
