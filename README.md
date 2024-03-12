@@ -17,7 +17,7 @@
 
 ## About The Project
 
-![Screen Shot](images/screenshot.png)
+![Screen Shot](Assets/Take2.png)
 
 Features:
 
