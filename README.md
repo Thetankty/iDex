@@ -17,7 +17,11 @@
 
 ## About The Project
 
+<div align="center">
+  
 ![Screen Shot](Assets/Take2.png)
+
+</div>
 
 Features:
 
